@@ -40,7 +40,7 @@ jobs:
 
       # Build and Push Docker image 
       - name: Build, tag, and push image to Artifact Registry
-        id: build-image
+        id: build-push-image
         run: |
           cd api
           docker build -t $REGISTRY/$REPOSITORY/$IMAGE:$IMAGE_TAG -t $REGISTRY/$REPOSITORY/$IMAGE:latest .
