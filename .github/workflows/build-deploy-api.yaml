@@ -8,7 +8,7 @@ on:
     - api/**
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -38,10 +38,10 @@ jobs:
             echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
 
       # Build and Push Docker image 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build, tag, and push image to Artifact Registry
         id: build-image
         env:
-          REGISTRY: 'us-central1-docker.pkg.dev/cloudmade-sandbox/'
+          REGISTRY: 'us-central1-docker.pkg.dev/cloudmade-sandbox'
           REPOSITORY: toptal
           IMAGE: api
           IMAGE_TAG: ${{ github.sha }}
