@@ -6,7 +6,7 @@ on:
     - master
     paths:
     - web/**
-    - devops/**
+    - .github/workflows/build-deploy-web.yaml
 
 jobs:
   build-and-deploy:
