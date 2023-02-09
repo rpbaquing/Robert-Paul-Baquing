@@ -6,6 +6,7 @@ on:
     - master
     paths:
     - web/**
+    - devops/**
 
 jobs:
   build-and-deploy:
@@ -19,7 +20,7 @@ jobs:
       REPOSITORY: toptal
       IMAGE: web
       IMAGE_TAG: ${{ github.sha }}
-      
+
     steps:
       # Authenticate to GCP
       - uses: actions/checkout@v3

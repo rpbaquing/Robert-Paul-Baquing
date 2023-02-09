@@ -6,6 +6,7 @@ on:
     - master
     paths:
     - api/**
+    - devops/**
 
 jobs:
   build-and-deploy:
