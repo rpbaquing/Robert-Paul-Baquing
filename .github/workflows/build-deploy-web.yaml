@@ -54,5 +54,5 @@ jobs:
       - name: Deploy to GKE
         id: 'deploy-gke'
         run: |
-          kubectl get image deployment/web web=$IMAGE:$IMAGE_TAG
+          kubectl set image deployment/web web=$IMAGE:$IMAGE_TAG
           kubectl rollout status deployment/web
