@@ -14,6 +14,12 @@ jobs:
       id-token: 'write'
 
     runs-on: ubuntu-18.04
+    env:
+      REGISTRY: 'us-central1-docker.pkg.dev/cloudmade-sandbox'
+      REPOSITORY: toptal
+      IMAGE: web
+      IMAGE_TAG: ${{ github.sha }}
+      
     steps:
       # Authenticate to GCP
       - uses: actions/checkout@v3
@@ -34,11 +40,6 @@ jobs:
       # Build and Push Docker image 
       - name: Build, tag, and push image to Artifact Registry
         id: build-image
-        env:
-          REGISTRY: 'us-central1-docker.pkg.dev/cloudmade-sandbox'
-          REPOSITORY: toptal
-          IMAGE: web
-          IMAGE_TAG: ${{ github.sha }}
         run: |
           cd web
           docker build -t $REGISTRY/$REPOSITORY/$IMAGE:$IMAGE_TAG -t $REGISTRY/$REPOSITORY/$IMAGE:latest .
