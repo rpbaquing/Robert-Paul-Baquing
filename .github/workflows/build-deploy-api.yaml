@@ -40,6 +40,7 @@ jobs:
           IMAGE: api
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          cd api
           docker build -t $REGISTRY/$REPOSITORY/$IMAGE:$IMAGE_TAG -t $REGISTRY/$REPOSITORY/$IMAGE:latest .
           docker push $REGISTRY/$REPOSITORY/$IMAGE:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY/$IMAGE:latest
