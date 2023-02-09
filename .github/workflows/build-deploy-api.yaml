@@ -1,0 +1,63 @@
+name: Build and Deploy API
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - api
+
+jobs:
+  build-and-push:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: ubuntu-18.04
+    steps:
+      # Authenticate to GCP
+      - uses: actions/checkout@v3
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+          token_format: 'access_token'
+
+      # Install gcloud, `setup-gcloud` automatically picks up authentication from `auth`.
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      # Login to Artifact Registry
+      - uses: 'docker/login-action@v1'
+        with:
+          registry: 'us-central1-docker.pkg.dev'
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+      - run: |-
+            echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
+
+      # Build and Push Docker image 
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          REGISTRY: 'us-central1-docker.pkg.dev/cloudmade-sandbox/'
+          REPOSITORY: toptal
+          IMAGE: api
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY/$IMAGE:$IMAGE_TAG -t $REGISTRY/$REPOSITORY/$IMAGE:latest .
+          docker push $REGISTRY/$REPOSITORY/$IMAGE:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY/$IMAGE:latest
+
+      - id: 'get-credentials'
+        uses: 'google-github-actions/get-gke-credentials@v1'
+        with:
+          cluster_name: 'toptal-cluster'
+          location: 'us-central1-a'
+
+      - name: Deploy to GKE
+        id: 'deploy-gke'
+        run: |
+          kubectl get image deployment/api api=$IMAGE:$IMAGE_TAG
+          kubectl rollout status deployment/api
